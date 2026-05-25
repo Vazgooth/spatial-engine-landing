@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FSCE-100M — Framer Spatial Cinematic Engine</title>
-  <meta name="description" content="The $100M framework for Framer developers who build digital worlds that convert traffic into high-ticket revenue — with Hollywood precision.">
+  <title>Spatial Engine â FSCE Protocol v4.0</title>
+  <meta name="description" content="The cinematic intelligence layer for AI builders and digital studios. Build what AI can't imagine â funnels, storefronts, and course worlds that convert at production-level precision.">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,17 +16,21 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
   <style>
-    /* ─── RESET & TOKENS ──────────────────────────── */
+    /* âââ RESET & TOKENS ââââââââââââââââââââââââââââ */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg:      #06060C;
-      --bg-2:    #0A0A14;
-      --text:    #E8E8F0;
-      --muted:   #505068;
-      --accent:  #00FFD1;
-      --plasma:  #7B61FF;
-      --border:  rgba(255,255,255,0.06);
+      --bg:       #060608;
+      --bg-2:     #0F0F12;
+      --bg-3:     #161619;
+      --text:     #F0EEE8;
+      --muted:    rgba(240,238,232,0.50);
+      --ghost:    rgba(240,238,232,0.20);
+      --accent:   #C9A84C;
+      --accent2:  #E8C96A;
+      --plasma:   #5B3AE8;
+      --border:   rgba(255,255,255,0.06);
+      --border2:  rgba(255,255,255,0.10);
       --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -42,7 +46,7 @@
 
     body.loading { overflow: hidden; }
 
-    /* ─── GRAIN ───────────────────────────────────── */
+    /* âââ GRAIN âââââââââââââââââââââââââââââââââââââ */
     body::after {
       content: '';
       position: fixed;
@@ -54,7 +58,7 @@
       mix-blend-mode: overlay;
     }
 
-    /* ─── CURSOR ──────────────────────────────────── */
+    /* âââ CURSOR ââââââââââââââââââââââââââââââââââââ */
     .cursor-dot {
       width: 6px;
       height: 6px;
@@ -84,7 +88,7 @@
       border-color: var(--accent);
     }
 
-    /* ─── LOADER ──────────────────────────────────── */
+    /* âââ LOADER ââââââââââââââââââââââââââââââââââââ */
     #loader {
       position: fixed;
       inset: 0;
@@ -116,7 +120,7 @@
       text-align: center;
     }
 
-    /* ─── PARTICLE CANVAS ─────────────────────────── */
+    /* âââ PARTICLE CANVAS âââââââââââââââââââââââââââ */
     #particle-canvas {
       position: fixed;
       inset: 0;
@@ -125,7 +129,7 @@
       pointer-events: none;
     }
 
-    /* ─── NAV ─────────────────────────────────────── */
+    /* âââ NAV âââââââââââââââââââââââââââââââââââââââ */
     nav {
       position: fixed;
       top: 0;
@@ -147,6 +151,9 @@
     }
 
     .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.18em;
@@ -155,7 +162,14 @@
       text-decoration: none;
     }
 
-    .nav-logo span { color: var(--accent); }
+    .nav-logo .wordmark { color: var(--text); }
+    .nav-logo .wordmark-protocol {
+      color: var(--accent);
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      margin-left: 2px;
+    }
 
     .nav-cta {
       display: inline-flex;
@@ -179,7 +193,7 @@
       color: var(--accent);
     }
 
-    /* ─── LAYOUT ──────────────────────────────────── */
+    /* âââ LAYOUT ââââââââââââââââââââââââââââââââââââ */
     section { position: relative; z-index: 1; }
 
     .container {
@@ -188,7 +202,7 @@
       padding: 0 48px;
     }
 
-    /* ─── HERO ────────────────────────────────────── */
+    /* âââ HERO ââââââââââââââââââââââââââââââââââââââ */
     #hero {
       min-height: 100vh;
       display: flex;
@@ -218,8 +232,8 @@
       width: 900px;
       height: 700px;
       background: radial-gradient(ellipse at center,
-        rgba(123,97,255,0.13) 0%,
-        rgba(0,255,209,0.06) 40%,
+        rgba(91,58,232,0.12) 0%,
+        rgba(201,168,76,0.07) 40%,
         transparent 70%);
       pointer-events: none;
     }
@@ -316,7 +330,7 @@
     }
 
     .btn-primary:hover {
-      background: #00e8bc;
+      background: var(--accent2);
       transform: translateY(-1px);
     }
 
@@ -368,7 +382,7 @@
       50%       { opacity: 0.8; transform: scaleY(0.65); }
     }
 
-    /* ─── TICKER ──────────────────────────────────── */
+    /* âââ TICKER ââââââââââââââââââââââââââââââââââââ */
     .ticker-wrap {
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
@@ -406,7 +420,7 @@
       100% { transform: translateX(-50%); }
     }
 
-    /* ─── SECTION LABEL ───────────────────────────── */
+    /* âââ SECTION LABEL âââââââââââââââââââââââââââââ */
     .section-label {
       font-size: 10px;
       letter-spacing: 0.35em;
@@ -417,7 +431,7 @@
       transform: translateY(14px);
     }
 
-    /* ─── CAPABILITIES ────────────────────────────── */
+    /* âââ CAPABILITIES ââââââââââââââââââââââââââââââ */
     #capabilities { padding: 140px 0; }
 
     .cap-list { list-style: none; }
@@ -493,7 +507,7 @@
     .cap-item:hover .cap-tag   { opacity: 1; transform: translateX(0); color: var(--accent); border-color: rgba(0,255,209,0.25); }
     .cap-item:hover .cap-arrow { transform: translateX(8px); color: var(--accent); }
 
-    /* ─── STATS ───────────────────────────────────── */
+    /* âââ STATS âââââââââââââââââââââââââââââââââââââ */
     #stats {
       padding: 100px 0;
       border-top: 1px solid var(--border);
@@ -532,7 +546,7 @@
       line-height: 1.5;
     }
 
-    /* ─── MECHANISM ───────────────────────────────── */
+    /* âââ MECHANISM âââââââââââââââââââââââââââââââââ */
     #mechanism { padding: 140px 0; }
 
     .mech-grid {
@@ -586,7 +600,7 @@
       color: var(--muted);
     }
 
-    /* ─── COMPARISON ──────────────────────────────── */
+    /* âââ COMPARISON ââââââââââââââââââââââââââââââââ */
     #comparison {
       padding: 140px 0;
       background: var(--bg-2);
@@ -682,7 +696,7 @@
       display: block;
     }
 
-    /* ─── MODULES ─────────────────────────────────── */
+    /* âââ MODULES âââââââââââââââââââââââââââââââââââ */
     #modules { padding: 140px 0; }
 
     .modules-grid {
@@ -738,7 +752,7 @@
       color: var(--muted);
     }
 
-    /* ─── PRICING ─────────────────────────────────── */
+    /* âââ PRICING âââââââââââââââââââââââââââââââââââ */
     #pricing {
       padding: 140px 0;
       background: var(--bg-2);
@@ -853,7 +867,7 @@
     }
 
     .pricing-feat-list li::before {
-      content: '→';
+      content: 'â';
       color: var(--accent);
       flex-shrink: 0;
       font-size: 11px;
@@ -875,7 +889,7 @@
       max-width: 280px;
     }
 
-    /* ─── EVIDENCE ────────────────────────────────── */
+    /* âââ EVIDENCE ââââââââââââââââââââââââââââââââââ */
     #evidence { padding: 140px 0; }
 
     .evidence-grid {
@@ -921,7 +935,7 @@
       margin-top: 4px;
     }
 
-    /* ─── FAQ ─────────────────────────────────────── */
+    /* âââ FAQ âââââââââââââââââââââââââââââââââââââââ */
     #faq {
       padding: 140px 0;
       background: var(--bg-2);
@@ -987,7 +1001,7 @@
       max-width: 660px;
     }
 
-    /* ─── CTA FINAL ───────────────────────────────── */
+    /* âââ CTA FINAL âââââââââââââââââââââââââââââââââ */
     #cta-final {
       padding: 160px 48px;
       text-align: center;
@@ -1001,7 +1015,7 @@
       top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       width: 700px; height: 500px;
-      background: radial-gradient(ellipse, rgba(123,97,255,0.08) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(91,58,232,0.08) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -1067,7 +1081,7 @@
       color: #009CDE;
     }
 
-    /* ─── FOOTER ──────────────────────────────────── */
+    /* âââ FOOTER ââââââââââââââââââââââââââââââââââââ */
     footer {
       padding: 36px 48px;
       border-top: 1px solid var(--border);
@@ -1094,13 +1108,13 @@
       opacity: 0.4;
     }
 
-    /* ─── REVEAL BASE ─────────────────────────────── */
+    /* âââ REVEAL BASE âââââââââââââââââââââââââââââââ */
     .reveal {
       opacity: 0;
       transform: translateY(28px);
     }
 
-    /* ─── MOBILE ──────────────────────────────────── */
+    /* âââ MOBILE ââââââââââââââââââââââââââââââââââââ */
     @media (max-width: 900px) {
       nav { padding: 20px 24px; }
       #hero { padding: 110px 24px 80px; }
@@ -1145,24 +1159,38 @@
 
 <!-- Loader -->
 <div id="loader">
-  <div id="loader-brand">FSCE — 100M</div>
+  <div id="loader-brand">SPATIAL ENGINE</div>
   <div id="loader-count">000</div>
 </div>
 
 <!-- Particles -->
 <canvas id="particle-canvas"></canvas>
 
-<!-- ══ NAV ══════════════════════════════════════════ -->
+<!-- ââ NAV ââââââââââââââââââââââââââââââââââââââââââ -->
 <nav id="nav">
-  <a href="#" class="nav-logo">FSCE<span>—</span>100M</a>
-  <a href="#pricing" class="nav-cta">Get Access ↗</a>
+  <a href="#" class="nav-logo">
+    <svg viewBox="-3 -3 106 106" xmlns="http://www.w3.org/2000/svg" width="22" height="22" style="flex-shrink:0">
+      <line x1="22" y1="10" x2="78" y2="10" stroke="#C9A84C" stroke-width="2"/>
+      <line x1="90" y1="22" x2="90" y2="78" stroke="#C9A84C" stroke-width="2"/>
+      <line x1="78" y1="90" x2="22" y2="90" stroke="#C9A84C" stroke-width="2"/>
+      <line x1="10" y1="78" x2="10" y2="22" stroke="#C9A84C" stroke-width="2"/>
+      <line x1="10" y1="50" x2="50" y2="10" stroke="#F0EEE8" stroke-width="1.5"/>
+      <line x1="50" y1="10" x2="90" y2="50" stroke="#F0EEE8" stroke-width="1.5"/>
+      <line x1="90" y1="50" x2="50" y2="90" stroke="#F0EEE8" stroke-width="1.5"/>
+      <line x1="50" y1="90" x2="10" y2="50" stroke="#F0EEE8" stroke-width="1.5"/>
+      <circle cx="50" cy="50" r="5" fill="#C9A84C"/>
+      <circle cx="50" cy="50" r="2" fill="#060608"/>
+    </svg>
+    <span class="wordmark">SPATIAL ENGINE</span>
+  </a>
+  <a href="#pricing" class="nav-cta">Activate the Engine &rarr;</a>
 </nav>
 
-<!-- ══ HERO ═════════════════════════════════════════ -->
+<!-- ââ HERO âââââââââââââââââââââââââââââââââââââââââ -->
 <section id="hero">
   <div class="hero-glow"></div>
   <div class="hero-content">
-    <p class="hero-eyebrow">Framer Spatial Cinematic Engine · V4.0</p>
+    <p class="hero-eyebrow">FSCE Protocol Â· v4.0</p>
     <h1 class="hero-title">
       <span class="line solid" ><span class="line-inner">SPATIAL</span></span>
       <span class="line ghost" ><span class="line-inner">ENGINE</span></span>
@@ -1170,11 +1198,11 @@
     </h1>
     <div class="hero-bottom">
       <p class="hero-tagline">
-        The $100M framework for Framer developers who build digital worlds that convert traffic into high-ticket revenue — with Hollywood precision.
+        Build what AI can't imagine. The cinematic intelligence layer for digital studios and AI builders who refuse to ship generic.
       </p>
       <div class="hero-actions">
-        <a href="#pricing" class="btn-primary">Build With FSCE ↗</a>
-        <a href="#capabilities" class="btn-ghost">See the system ↓</a>
+        <a href="#pricing" class="btn-primary">Activate the Engine &rarr;</a>
+        <a href="#capabilities" class="btn-ghost">See the system &darr;</a>
       </div>
     </div>
   </div>
@@ -1187,26 +1215,26 @@
 <!-- Ticker -->
 <div class="ticker-wrap">
   <div class="ticker-track">
-    <span class="ticker-item">COACHES</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">AGENCIES</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">COURSE CREATORS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">E-COMMERCE BRANDS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">THERAPISTS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">MENTORS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">HIGH-TICKET SERVICES</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">SAAS FOUNDERS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">COACHK���span><span class="ticker-sep">·</span>
-    <span class="ticker-item">AGENCIES</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">COURSE CREATORS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">E-COMMERCE BRANDS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">THERAPISTS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">MENTORS</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">HIGH-TICKET SERVICES</span><span class="ticker-sep">·</span>
-    <span class="ticker-item">SAAS FOUNDERS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">COACHES</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">AGENCIES</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">COURSE CREATORS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">E-COMMERCE BRANDS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">THERAPISTS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">MENTORS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">HIGH-TICKET SERVICES</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">SAAS FOUNDERS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">COACHES</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">AGENCIES</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">COURSE CREATORS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">E-COMMERCE BRANDS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">THERAPISTS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">MENTORS</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">HIGH-TICKET SERVICES</span><span class="ticker-sep">&middot;</span>
+    <span class="ticker-item">SAAS FOUNDERS</span><span class="ticker-sep">&middot;</span>
   </div>
 </div>
 
-<!-- ══ CAPABILITIES ══════════════════════════════════ -->
+<!-- ââ CAPABILITIES ââââââââââââââââââââââââââââââââââ -->
 <section id="capabilities">
   <div class="container">
     <p class="section-label">What We Engineer</p>
@@ -1216,7 +1244,7 @@
           <span class="cap-num">01</span>
           <span class="cap-name">Cinematic Landing Pages</span>
           <span class="cap-tag">Convert</span>
-          <span class="cap-arrow">→</span>
+          <span class="cap-arrow">&rarr;</span>
         </div>
       </li>
       <li class="cap-item">
@@ -1224,7 +1252,7 @@
           <span class="cap-num">02</span>
           <span class="cap-name">High-Ticket VSL Funnels</span>
           <span class="cap-tag">Sell</span>
-          <span class="cap-arrow">→</span>
+          <span class="cap-arrow">&rarr;</span>
         </div>
       </li>
       <li class="cap-item">
@@ -1232,7 +1260,7 @@
           <span class="cap-num">03</span>
           <span class="cap-name">Gamified Course Platforms</span>
           <span class="cap-tag">Retain</span>
-          <span class="cap-arrow">→</span>
+          <span class="cap-arrow">&rarr;</span>
         </div>
       </li>
       <li class="cap-item">
@@ -1240,7 +1268,7 @@
           <span class="cap-num">04</span>
           <span class="cap-name">Anti-Shopify Storefronts</span>
           <span class="cap-tag">Scale</span>
-          <span class="cap-arrow">→</span>
+          <span class="cap-arrow">&rarr;</span>
         </div>
       </li>
       <li class="cap-item">
@@ -1248,7 +1276,7 @@
           <span class="cap-num">05</span>
           <span class="cap-name">Behavioral Conversion Architecture</span>
           <span class="cap-tag">Optimize</span>
-          <span class="cap-arrow">→</span>
+          <span class="cap-arrow">&rarr;</span>
         </div>
       </li>
       <li class="cap-item">
@@ -1256,14 +1284,14 @@
           <span class="cap-num">06</span>
           <span class="cap-name">Framer Component Systems</span>
           <span class="cap-tag">Build</span>
-          <span class="cap-arrow">→</span>
+          <span class="cap-arrow">&rarr;</span>
         </div>
       </li>
     </ul>
   </div>
 </section>
 
-<!-- ══ STATS ═════════════════════════════════════════ -->
+<!-- ââ STATS âââââââââââââââââââââââââââââââââââââââââ -->
 <section id="stats">
   <div class="container">
     <div class="stats-grid">
@@ -1271,19 +1299,19 @@
         <span class="stat-val"><span class="counter">0</span><span class="accent">%</span></span>
         <p class="stat-label">Average conversion lift over client's previous site</p>
       </div>
-      <div class="stat-item reveal" data-target="83" data-decimal="true" data-suffix="×">
-        <span class="stat-val"><span class="counter">0</span><span class="accent">×</span></span>
+      <div class="stat-item reveal" data-target="83" data-decimal="true" data-suffix="&times;">
+        <span class="stat-val"><span class="counter">0</span><span class="accent">&times;</span></span>
         <p class="stat-label">Average ROI reported by agency clients</p>
       </div>
       <div class="stat-item reveal" data-target="72" data-suffix="h">
         <span class="stat-val"><span class="counter">0</span><span class="accent">h</span></span>
-        <p class="stat-label">Time to first live Framer build</p>
+        <p class="stat-label">Time to first live Spatial Engine build</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ MECHANISM ═════════════════════════════════════ -->
+<!-- ââ MECHANISM ââââââââââââââââââââââââââââââââââââ -->
 <section id="mechanism">
   <div class="container">
     <p class="section-label reveal">How It Works</p>
@@ -1291,36 +1319,36 @@
       <div class="mech-item reveal">
         <span class="mech-num">01</span>
         <h3 class="mech-title">Cinematic Concept</h3>
-        <p class="mech-desc">Define the emotional tone, visual references, and gamification narrative. Every FSCE site starts with a story — not a template.</p>
+        <p class="mech-desc">Define the emotional tone, visual references, and gamification narrative. Every Spatial Engine build starts with a story &mdash; not a layout.</p>
       </div>
       <div class="mech-item reveal">
         <span class="mech-num">02</span>
         <h3 class="mech-title">Conversion Architecture</h3>
-        <p class="mech-desc">Map the psychological journey — hooks, friction elimination, dopamine loops, and urgency mechanics — before touching a single component.</p>
+        <p class="mech-desc">Map the psychological journey &mdash; hooks, friction elimination, dopamine loops, and urgency mechanics &mdash; before touching a single component.</p>
       </div>
       <div class="mech-item reveal">
         <span class="mech-num">03</span>
         <h3 class="mech-title">Framer Execution</h3>
-        <p class="mech-desc">Build, deploy, and iterate with the FSCE component library, custom code overrides, and scroll-reactive motion systems tuned for conversion.</p>
+        <p class="mech-desc">Build, deploy, and iterate with the Spatial Engine component library, custom code overrides, and scroll-reactive motion systems tuned for conversion.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ COMPARISON ════════════════════════════════════ -->
+<!-- ââ COMPARISON ââââââââââââââââââââââââââââââââââââ -->
 <section id="comparison">
   <div class="container">
-    <p class="section-label reveal">Before · After</p>
+    <p class="section-label reveal">Before &middot; After</p>
     <div class="comparison-grid">
       <div class="comparison-side before reveal">
-        <div class="comparison-label">Without FSCE</div>
+        <div class="comparison-label">Without Spatial Engine</div>
         <ul class="comparison-items">
-          <li>Generic Hotmart or Shopify template — identical to every competitor</li>
+          <li>Generic Hotmart or Shopify template &mdash; identical to every competitor</li>
           <li>Static layout with no motion, no micro-interactions, no scroll behavior</li>
-          <li>Checkout is a full page jump — momentum dies at the critical moment</li>
-          <li>No visual hierarchy — visitors don't know where to look first</li>
-          <li>Mobile version is an afterthought — janky, unresponsive, forgettable</li>
-          <li>Zero psychological hooks — traffic leaves without acting</li>
+          <li>Checkout is a full page jump &mdash; momentum dies at the critical moment</li>
+          <li>No visual hierarchy &mdash; visitors don't know where to look first</li>
+          <li>Mobile version is an afterthought &mdash; janky, unresponsive, forgettable</li>
+          <li>Zero psychological hooks &mdash; traffic leaves without acting</li>
         </ul>
         <div class="comparison-metric">
           <strong>~1.8%</strong>
@@ -1328,25 +1356,25 @@
         </div>
       </div>
       <div class="comparison-side after reveal">
-        <div class="comparison-label">With FSCE</div>
+        <div class="comparison-label">With Spatial Engine</div>
         <ul class="comparison-items">
           <li>Cinematic digital world built around your brand's specific narrative</li>
-          <li>Particle systems, scroll transforms, magnetic cursors — every element reacts</li>
-          <li>Three-dimensional micro-animated checkout transition — friction eliminated</li>
+          <li>Particle systems, scroll transforms, magnetic cursors &mdash; every element reacts</li>
+          <li>Three-dimensional micro-animated checkout transition &mdash; friction eliminated</li>
           <li>Precision visual hierarchy that guides attention through the conversion flow</li>
-          <li>Full cinematic experience on every screen — mobile-first, no exceptions</li>
-          <li>Dopamine loops engineered into every interaction — visitors want to stay</li>
+          <li>Full cinematic experience on every screen &mdash; mobile-first, no exceptions</li>
+          <li>Dopamine loops engineered into every interaction &mdash; visitors want to stay</li>
         </ul>
         <div class="comparison-metric">
           <strong>~8.7%</strong>
-          <span>Reported conversion rate on FSCE-built pages</span>
+          <span>Reported conversion rate on Spatial Engine builds</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ MODULES ════════════════════════════════════════ -->
+<!-- ââ MODULES ââââââââââââââââââââââââââââââââââââââââ -->
 <section id="modules">
   <div class="container">
     <p class="section-label reveal">What's Inside</p>
@@ -1369,29 +1397,433 @@
       <div class="module-item reveal">
         <div class="module-num">M-04</div>
         <div class="module-name">Scroll Motion Library</div>
-        <div class="module-desc">GSAP ScrollTrigger orchestration — parallax, pinned sequences, horizontal scrolls, and staggered cascade reveals.</div>
+        <div class="module-desc">GSAP ScrollTrigger orchestration &mdash; parallax, pinned sequences, horizontal scrolls, and staggered cascade reveals.</div>
       </div>
       <div class="module-item reveal">
         <div class="module-num">M-05</div>
         <div class="module-name">VSL Reactive Interface</div>
-        <div class="module-desc">Page responds to video state — suspense mode on pause, unlock animations on price reveal, cinematic cue system throughout.</div>
+        <div class="module-desc">Page sections self-unlock as the video progresses &mdash; suspense mode on pause, offer reveal on price drop, dopamine burst on CTA.</div>
       </div>
       <div class="module-item reveal">
         <div class="module-num">M-06</div>
-        <div class="module-name">Gamified Checkout</div>
-        <div class="module-desc">Fluid cart-to-checkout transitions, dynamic bundling UIs, and progress indicators that reward and accelerate momentum.</div>
+        <div class="module-name">Gamified Course Architecture</div>
+        <div class="module-desc">Level-based progress engines with Lottie/Rive badge unlocks, XP bars, and micro-rewards on every lesson completion.</div>
       </div>
       <div class="module-item reveal">
         <div class="module-num">M-07</div>
-        <div class="module-name">Course Universe System</div>
-        <div class="module-desc">Transform module lists into interactive portals. Energy bars, badge unlocks, Lottie/Rive integrations for dopamine on every lesson.</div>
+        <div class="module-name">Anti-Shopify Checkout</div>
+        <div class="module-desc">3D micro-animated cart transitions, drag-to-build bundle systems, and zero-friction payment overlays &mdash; no page jumps.</div>
       </div>
       <div class="module-item reveal">
         <div class="module-num">M-08</div>
-        <div class="module-name">Typography Motion Kit</div>
-        <div class="module-desc">Clip-path reveals, ghost text, kinetic headings, and split-text animations engineered for cinematic typographic impact.</div>
+        <div class="module-name">Behavioral Hook System</div>
+        <div class="module-desc">Urgency timers, social proof pulses, cursor-gradient lighting, and staggered copy reveals tuned to attention science.</div>
       </div>
       <div class="module-item reveal">
         <div class="module-num">M-09</div>
-        <div class="module-name">Code Override Vault</div>
-        <div class="module-desc">70+ custom Fram
+        <div class="module-name">Framer Override Library</div>
+        <div class="module-desc">Production-ready code overrides for React, Framer Motion, and Three.js &mdash; drop in, configure, ship. No reinvention.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ââ PRICING âââââââââââââââââââââââââââââââââââââââ -->
+<section id="pricing">
+  <div class="container">
+    <p class="section-label reveal">Activate the Engine</p>
+    <div class="pricing-list">
+
+      <div class="pricing-row reveal">
+        <div class="pricing-row-header" onclick="togglePricing(this)">
+          <span class="pricing-tier">Ignition</span>
+          <span class="pricing-badge">Entry</span>
+          <span class="pricing-price">$2,400</span>
+          <span class="pricing-toggle">+</span>
+        </div>
+        <div class="pricing-body">
+          <div class="pricing-body-inner">
+            <ul class="pricing-feat-list">
+              <li>Single cinematic landing page built in Framer (up to 8 sections)</li>
+              <li>Particle field + magnetic cursor + scroll motion system</li>
+              <li>Brandbook-compliant visual identity integration</li>
+              <li>Cinematic loader with counter sequence</li>
+              <li>Mobile-first responsive engineering</li>
+              <li>2 rounds of revision &mdash; delivered in 72h</li>
+            </ul>
+            <div class="pricing-cta-wrap">
+              <p class="pricing-desc">For founders launching a flagship product or first high-ticket offer.</p>
+              <a href="https://www.paypal.com/ncp/payment/FSCE-IGNITION" class="btn-primary">Activate the Engine &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pricing-row featured reveal">
+        <div class="pricing-row-header" onclick="togglePricing(this)">
+          <span class="pricing-tier">Orbital</span>
+          <span class="pricing-badge">Most Popular</span>
+          <span class="pricing-price">$4,800</span>
+          <span class="pricing-toggle">+</span>
+        </div>
+        <div class="pricing-body">
+          <div class="pricing-body-inner">
+            <ul class="pricing-feat-list">
+              <li>Full funnel &mdash; landing + VSL page + checkout overlay</li>
+              <li>Complete Spatial Engine module stack (M-01 through M-08)</li>
+              <li>High-ticket VSL reactive interface &mdash; page responds to video progress</li>
+              <li>Custom Framer component system with documented overrides</li>
+              <li>Stripe/PayPal embedded checkout &mdash; zero page-jump flow</li>
+              <li>GSAP ScrollTrigger cinematic sequences</li>
+              <li>3 rounds of revision &mdash; delivered in 5 days</li>
+            </ul>
+            <div class="pricing-cta-wrap">
+              <p class="pricing-desc">For agencies and coaches scaling a high-ticket offer above $3K.</p>
+              <a href="https://www.paypal.com/ncp/payment/FSCE-ORBITAL" class="btn-primary">Activate the Engine &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pricing-row reveal">
+        <div class="pricing-row-header" onclick="togglePricing(this)">
+          <span class="pricing-tier">Universe</span>
+          <span class="pricing-badge">Full Stack</span>
+          <span class="pricing-price">$8,400</span>
+          <span class="pricing-toggle">+</span>
+        </div>
+        <div class="pricing-body">
+          <div class="pricing-body-inner">
+            <ul class="pricing-feat-list">
+              <li>Full cinematic digital world &mdash; landing, funnel, course platform</li>
+              <li>Gamified learning universe with Level 1&ndash;9 architecture and Rive badges</li>
+              <li>Anti-Shopify storefront with drag-to-build bundles and 3D checkout</li>
+              <li>Behavioral conversion architecture &mdash; every interaction engineered</li>
+              <li>Custom Three.js or WebGL integration if required</li>
+              <li>Framer CMS setup + dynamic content pipeline</li>
+              <li>Full source handoff + component documentation</li>
+              <li>Unlimited revisions for 14 days post-launch</li>
+            </ul>
+            <div class="pricing-cta-wrap">
+              <p class="pricing-desc">For studios and brands building a category-defining digital presence.</p>
+              <a href="https://www.paypal.com/ncp/payment/FSCE-UNIVERSE" class="btn-primary">Activate the Engine &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ââ EVIDENCE ââââââââââââââââââââââââââââââââââââââ -->
+<section id="evidence">
+  <div class="container">
+    <p class="section-label reveal">Client Results</p>
+    <div class="evidence-grid">
+      <div class="evidence-item reveal">
+        <span class="evidence-mark">&ldquo;</span>
+        <p class="evidence-quote">We went from a Hotmart template everyone ignores to something that makes prospects say &ldquo;what is this?&rdquo; The conversion rate on our $3,500 coaching offer went from 1.4% to 6.8% in the first 30 days.</p>
+        <p class="evidence-author">Rodrigo M.</p>
+        <p class="evidence-role">Business Transformation Coach &middot; S&atilde;o Paulo</p>
+      </div>
+      <div class="evidence-item reveal">
+        <span class="evidence-mark">&ldquo;</span>
+        <p class="evidence-quote">The VSL page is insane. When the price reveal happens the whole interface shifts &mdash; clients actually comment on it before they comment on the offer. We closed $47K in the launch week.</p>
+        <p class="evidence-author">Camila V.</p>
+        <p class="evidence-role">Founder, Escuela de Marca &middot; Mexico City</p>
+      </div>
+      <div class="evidence-item reveal">
+        <span class="evidence-mark">&ldquo;</span>
+        <p class="evidence-quote">Our agency uses the Spatial Engine stack on every premium client now. The Three.js overrides alone save us 40+ hours per project. This is infrastructure, not a template.</p>
+        <p class="evidence-author">Dev Studio NXVV</p>
+        <p class="evidence-role">Creative Technology Agency &middot; Buenos Aires</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ââ FAQ âââââââââââââââââââââââââââââââââââââââââââ -->
+<section id="faq">
+  <div class="container">
+    <p class="section-label reveal">Questions</p>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Do I need to know how to use Framer?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">No. We build everything for you. If you already have a Framer account we work directly in it; if not, we set one up and hand it over on delivery. You receive the live site, the Framer project, and documentation on how to make copy and image changes yourself without touching code.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          How long does a build take?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Ignition delivers in 72 hours. Orbital in 5 business days. Universe in 10 to 14 days. Timeline starts from brand brief approval &mdash; we move fast because every hour your current site is live is an hour of lost conversion.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          What do you need from me to start?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">A brand brief (colors, fonts, tone), your offer details (price, promise, audience), any existing copy or a rough idea of it, and your logo or wordmark. We handle everything else &mdash; layout, motion, code, mobile, and deployment.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Can you integrate with my existing payment system?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Yes. We integrate with Stripe, PayPal, Hotmart, Kiwify, Eduzz, and most Latin American payment processors. For Orbital and Universe tiers we also build the embedded checkout overlay so there is zero friction at the moment of purchase.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          What if I want changes after delivery?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Ignition includes 2 revision rounds, Orbital includes 3, and Universe includes unlimited revisions for 14 days post-launch. After that, revision packs are available at a fixed rate. We stay close to our builds &mdash; we want them to convert as much as you do.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          Is this only for Framer?
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">The Spatial Engine is Framer-native &mdash; it is what makes the motion system and code overrides possible at this level. However we can adapt the visual and conversion architecture to Webflow for clients locked into that ecosystem. Reach out to discuss.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ââ CTA FINAL ââââââââââââââââââââââââââââââââââââââ -->
+<section id="cta-final">
+  <p class="cta-pre reveal">Ready to Build</p>
+  <h2 class="cta-headline reveal">
+    Stop shipping<br>
+    <span class="ghost-line">generic.</span>
+  </h2>
+  <p class="cta-subtext reveal">The studios and coaches who win in the next 24 months will be the ones whose digital presence feels like a different category entirely.</p>
+  <div class="cta-buttons reveal">
+    <a href="https://www.paypal.com/ncp/payment/FSCE-ORBITAL" class="btn-primary">Activate the Engine &rarr;</a>
+    <a href="mailto:lucas@imaginium.io" class="btn-paypal">Book a Strategy Call</a>
+  </div>
+</section>
+
+<!-- ââ FOOTER ââââââââââââââââââââââââââââââââââââââââ -->
+<footer>
+  <div class="footer-logo">
+    <svg viewBox="-3 -3 106 106" xmlns="http://www.w3.org/2000/svg" width="18" height="18" style="flex-shrink:0;margin-right:8px;vertical-align:middle">
+      <line x1="22" y1="10" x2="78" y2="10" stroke="#C9A84C" stroke-width="2"/>
+      <line x1="90" y1="22" x2="90" y2="78" stroke="#C9A84C" stroke-width="2"/>
+      <line x1="78" y1="90" x2="22" y2="90" stroke="#C9A84C" stroke-width="2"/>
+      <line x1="10" y1="78" x2="10" y2="22" stroke="#C9A84C" stroke-width="2"/>
+      <line x1="10" y1="50" x2="50" y2="10" stroke="#F0EEE8" stroke-width="1.5"/>
+      <line x1="50" y1="10" x2="90" y2="50" stroke="#F0EEE8" stroke-width="1.5"/>
+      <line x1="90" y1="50" x2="50" y2="90" stroke="#F0EEE8" stroke-width="1.5"/>
+      <line x1="50" y1="90" x2="10" y2="50" stroke="#F0EEE8" stroke-width="1.5"/>
+      <circle cx="50" cy="50" r="5" fill="#C9A84C"/>
+      <circle cx="50" cy="50" r="2" fill="#060608"/>
+    </svg>
+    <span>SPATIAL ENGINE</span> <span style="color:var(--accent);margin-left:4px">&middot;</span> <span style="margin-left:4px">Imaginium Universe</span>
+  </div>
+  <p class="footer-legal">&copy; 2025 Imaginium Universe. All rights reserved.</p>
+</footer>
+
+<script>
+/* âââ CURSOR ââââââââââââââââââââââââââââââââââââââââ */
+const dot  = document.getElementById('cursorDot');
+const ring = document.getElementById('cursorRing');
+let mx = window.innerWidth/2, my = window.innerHeight/2;
+let rx = mx, ry = my;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+});
+
+(function lerp() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(lerp);
+})();
+
+document.querySelectorAll('a, button, .pricing-row-header, .faq-question, .cap-item').forEach(el => {
+  el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+  el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+});
+
+/* âââ LOADER ââââââââââââââââââââââââââââââââââââââââ */
+(function() {
+  const loader  = document.getElementById('loader');
+  const brand   = document.getElementById('loader-brand');
+  const counter = document.getElementById('loader-count');
+  let count = 0;
+  const start = Date.now();
+  const duration = 1600;
+
+  gsap.to(brand, { opacity: 1, duration: 0.6, delay: 0.1 });
+
+  function tick() {
+    const elapsed = Date.now() - start;
+    const t = Math.min(elapsed / duration, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    count = Math.floor(ease * 100);
+    counter.textContent = String(count).padStart(3, '0');
+    if (t < 1) { requestAnimationFrame(tick); }
+    else {
+      counter.textContent = '100';
+      gsap.to(loader, {
+        yPercent: -100, duration: 0.9, ease: 'power3.inOut', delay: 0.15,
+        onComplete: () => {
+          loader.style.display = 'none';
+          document.body.classList.remove('loading');
+          initHero();
+        }
+      });
+    }
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* âââ PARTICLES âââââââââââââââââââââââââââââââââââââ */
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles = [], mouse = { x: -9999, y: -9999 };
+  const COUNT = window.innerWidth < 768 ? 60 : 110;
+  const CONN  = 120;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  function Particle() {
+    this.x  = Math.random() * W;
+    this.y  = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.35;
+    this.vy = (Math.random() - 0.5) * 0.35;
+    this.r  = Math.random() * 1.6 + 0.4;
+    this.a  = Math.random() * 0.5 + 0.15;
+  }
+
+  for (let i = 0; i < COUNT; i++) particles.push(new Particle());
+
+  gsap.to(canvas, { opacity: 0.6, duration: 1.2, delay: 2.2 });
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      const dx = mouse.x - p.x, dy = mouse.y - p.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 140) { p.vx += dx * 0.00012; p.vy += dy * 0.00012; }
+      p.vx *= 0.992; p.vy *= 0.992;
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(201,168,76,' + p.a + ')';
+      ctx.fill();
+      for (let j = i+1; j < particles.length; j++) {
+        const q = particles[j];
+        const dx2 = p.x - q.x, dy2 = p.y - q.y;
+        const d = Math.sqrt(dx2*dx2 + dy2*dy2);
+        if (d < CONN) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = 'rgba(201,168,76,' + (0.08*(1-d/CONN)) + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* âââ HERO INTRO ââââââââââââââââââââââââââââââââââââ */
+function initHero() {
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+  tl.to('.hero-eyebrow', { opacity: 1, y: 0, duration: 0.7 })
+    .to('.hero-title .line-inner', { opacity: 1, y: 0, duration: 0.9, stagger: 0.12 }, '-=0.3')
+    .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.7 }, '-=0.4')
+    .to('.hero-actions', { opacity: 1, y: 0, duration: 0.7 }, '-=0.4')
+    .to('.hero-scroll',  { opacity: 1, duration: 0.6 }, '-=0.3');
+}
+
+/* âââ SCROLL REVEALS ââââââââââââââââââââââââââââââââ */
+gsap.registerPlugin(ScrollTrigger);
+
+document.querySelectorAll('.reveal').forEach(el => {
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: 0.85, ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+  });
+});
+
+/* âââ NAV SCROLL ââââââââââââââââââââââââââââââââââââ */
+const nav = document.getElementById('nav');
+ScrollTrigger.create({
+  start: 80,
+  onEnter:      () => nav.classList.add('scrolled'),
+  onLeaveBack:  () => nav.classList.remove('scrolled'),
+});
+
+/* âââ STATS COUNTER âââââââââââââââââââââââââââââââââ */
+document.querySelectorAll('.stat-item').forEach(item => {
+  const counter   = item.querySelector('.counter');
+  const target    = +item.dataset.target;
+  const isDecimal = item.dataset.decimal === 'true';
+  ScrollTrigger.create({
+    trigger: item, start: 'top 85%', once: true,
+    onEnter: () => {
+      gsap.to({ val: 0 }, {
+        val: target, duration: 1.8, ease: 'power2.out',
+        onUpdate: function() {
+          counter.textContent = isDecimal
+            ? this.targets()[0].val.toFixed(1)
+            : Math.floor(this.targets()[0].val);
+        }
+      });
+    }
+  });
+});
+
+/* âââ PRICING ACCORDION âââââââââââââââââââââââââââââ */
+function togglePricing(header) {
+  const row = header.closest('.pricing-row');
+  const isActive = row.classList.contains('active');
+  document.querySelectorAll('.pricing-row.active').forEach(r => r.classList.remove('active'));
+  if (!isActive) row.classList.add('active');
+}
+
+/* âââ FAQ ACCORDION âââââââââââââââââââââââââââââââââ */
+function toggleFaq(question) {
+  const item = question.closest('.faq-item');
+  const isActive = item.classList.contains('active');
+  document.querySelectorAll('.faq-item.active').forEach(i => i.classList.remove('active'));
+  if (!isActive) item.classList.add('active');
+}
+</script>
+</body>
+</html>
