@@ -1,26 +1,33 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spatial Engine — El Futuro del Diseño Web</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FSCE-100M — Framer Spatial Cinematic Engine</title>
+  <meta name="description" content="The $100M framework for Framer developers who build digital worlds that convert traffic into high-ticket revenue — with Hollywood precision.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ─── RESET & TOKENS ──────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #0A0A0F;
-      --bg2: #0F0F18;
-      --bg3: #141420;
-      --teal: #00FFD1;
-      --plasma: #7B61FF;
-      --text: #E8E8F0;
-      --muted: #6B6B80;
-      --border: rgba(255,255,255,0.06);
-      --glow-teal: rgba(0,255,209,0.15);
-      --glow-plasma: rgba(123,97,255,0.15);
+      --bg:      #06060C;
+      --bg-2:    #0A0A14;
+      --text:    #E8E8F0;
+      --muted:   #505068;
+      --accent:  #00FFD1;
+      --plasma:  #7B61FF;
+      --border:  rgba(255,255,255,0.06);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     html { scroll-behavior: smooth; }
@@ -33,1095 +40,1358 @@
       cursor: none;
     }
 
-    /* ── CURSOR ── */
-    #cursor {
+    body.loading { overflow: hidden; }
+
+    /* ─── GRAIN ───────────────────────────────────── */
+    body::after {
+      content: '';
       position: fixed;
-      width: 12px; height: 12px;
-      background: var(--teal);
-      border-radius: 50%;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.03;
       pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s, width 0.3s, height 0.3s, opacity 0.3s;
-      mix-blend-mode: difference;
+      z-index: 9998;
+      mix-blend-mode: overlay;
     }
-    #cursor-glow {
-      position: fixed;
-      width: 500px; height: 500px;
+
+    /* ─── CURSOR ──────────────────────────────────── */
+    .cursor-dot {
+      width: 6px;
+      height: 6px;
+      background: #fff;
       border-radius: 50%;
+      position: fixed;
+      transform: translate(-50%, -50%);
       pointer-events: none;
+      z-index: 10001;
+    }
+
+    .cursor-ring {
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      position: fixed;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10000;
+      transition: width 0.35s var(--ease-out), height 0.35s var(--ease-out), border-color 0.3s;
+    }
+
+    .cursor-ring.hover {
+      width: 60px;
+      height: 60px;
+      border-color: var(--accent);
+    }
+
+    /* ─── LOADER ──────────────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    #loader-brand {
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      opacity: 0;
+    }
+
+    #loader-count {
+      font-size: clamp(88px, 16vw, 180px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      min-width: 3ch;
+      text-align: center;
+    }
+
+    /* ─── PARTICLE CANVAS ─────────────────────────── */
+    #particle-canvas {
+      position: fixed;
+      inset: 0;
       z-index: 0;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(0,255,209,0.06) 0%, transparent 70%);
-      transition: left 0.8s ease, top 0.8s ease;
+      opacity: 0;
+      pointer-events: none;
     }
 
-    /* ── NAV ── */
+    /* ─── NAV ─────────────────────────────────────── */
     nav {
-      position: fixed; top: 0; left: 0; right: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 100;
-      padding: 20px 48px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(10,10,15,0.7);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
+      padding: 24px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.5s, backdrop-filter 0.5s, border-color 0.5s;
+      border-bottom: 1px solid transparent;
     }
-    .nav-logo {
-      font-size: 15px; font-weight: 600; letter-spacing: 0.08em;
-      color: var(--text); text-transform: uppercase;
-    }
-    .nav-logo span { color: var(--teal); }
-    .nav-cta {
-      padding: 10px 24px;
-      background: var(--teal);
-      color: #0A0A0F;
-      font-weight: 700; font-size: 13px;
-      border: none; border-radius: 6px;
-      cursor: pointer; text-decoration: none;
-      letter-spacing: 0.04em;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .nav-cta:hover { opacity: 0.85; transform: translateY(-1px); }
 
-    /* ── HERO ── */
+    nav.scrolled {
+      background: rgba(6,6,12,0.85);
+      backdrop-filter: blur(24px);
+      border-color: var(--border);
+    }
+
+    .nav-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .nav-cta:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ─── LAYOUT ──────────────────────────────────── */
+    section { position: relative; z-index: 1; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    /* ─── HERO ────────────────────────────────────── */
     #hero {
       min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center;
-      padding: 120px 24px 80px;
-      position: relative; overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 130px 48px 90px;
+      position: relative;
+      overflow: hidden;
     }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 16px;
-      border: 1px solid rgba(0,255,209,0.3);
-      border-radius: 100px;
-      font-size: 12px; font-weight: 500; color: var(--teal);
-      letter-spacing: 0.1em; text-transform: uppercase;
-      margin-bottom: 32px;
-      animation: fadeUp 0.8s ease forwards;
-      opacity: 0;
-    }
-    .hero-badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      background: var(--teal);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
-    }
-    h1 {
-      font-size: clamp(40px, 6vw, 88px);
-      font-weight: 700;
-      line-height: 1.05;
-      letter-spacing: -0.03em;
-      max-width: 900px;
-      animation: fadeUp 0.8s 0.2s ease forwards;
-      opacity: 0;
-    }
-    h1 .accent { color: var(--teal); }
-    h1 .accent-plasma { color: var(--plasma); }
-    .hero-sub {
-      margin-top: 24px;
-      font-size: clamp(16px, 2vw, 20px);
-      color: var(--muted);
-      max-width: 560px;
-      line-height: 1.6;
-      animation: fadeUp 0.8s 0.4s ease forwards;
-      opacity: 0;
-    }
-    .hero-actions {
-      margin-top: 48px;
-      display: flex; gap: 16px; align-items: center;
-      animation: fadeUp 0.8s 0.6s ease forwards;
-      opacity: 0;
-    }
-    .btn-primary {
-      padding: 16px 36px;
-      background: var(--teal);
-      color: #0A0A0F;
-      font-weight: 700; font-size: 15px;
-      border: none; border-radius: 8px;
-      cursor: pointer; text-decoration: none;
-      letter-spacing: 0.02em;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 0 rgba(0,255,209,0);
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(0,255,209,0.3);
-    }
-    .btn-ghost {
-      padding: 16px 24px;
-      background: transparent;
-      color: var(--muted);
-      font-size: 14px;
-      border: none; cursor: pointer; text-decoration: none;
-      transition: color 0.2s;
-    }
-    .btn-ghost:hover { color: var(--text); }
 
-    /* hero grid lines */
-    .grid-lines {
-      position: absolute; inset: 0;
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
       background-size: 80px 80px;
       pointer-events: none;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
     }
 
-    /* ── SCROLL ANIMATION ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .reveal {
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
-
-    /* ── SECTION BASE ── */
-    section {
-      position: relative;
-      padding: 120px 24px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .section-label {
-      font-size: 11px; font-weight: 600;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--teal);
-      margin-bottom: 16px;
-    }
-    h2 {
-      font-size: clamp(32px, 4vw, 56px);
-      font-weight: 700; line-height: 1.1;
-      letter-spacing: -0.025em;
-    }
-    h2 .accent { color: var(--teal); }
-
-    /* ── BEFORE/AFTER ── */
-    #demo {
-      padding: 120px 24px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .demo-header { text-align: center; margin-bottom: 64px; }
-    .before-after {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      height: 480px;
-      user-select: none;
-    }
-    .ba-side {
-      position: absolute; top: 0; bottom: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      overflow: hidden;
-    }
-    .ba-before {
-      left: 0; right: 0;
-      background: #1a1a2e;
-    }
-    .ba-after {
-      left: 0;
-      width: 50%;
-      background: var(--bg2);
-      border-right: 2px solid var(--teal);
-      transition: width 0.02s;
-      box-shadow: 4px 0 40px rgba(0,255,209,0.2);
-    }
-    /* Before content */
-    .ba-before-inner {
-      width: 100%; padding: 40px;
-      display: flex; flex-direction: column; gap: 12px;
-    }
-    .ba-bar {
-      height: 12px; border-radius: 4px;
-      background: rgba(255,255,255,0.08);
-    }
-    .ba-bar.short { width: 40%; }
-    .ba-bar.mid { width: 65%; }
-    .ba-bar.full { width: 100%; }
-    .ba-btn-fake {
-      margin-top: 12px;
-      height: 40px; width: 140px; border-radius: 6px;
-      background: rgba(255,255,255,0.12);
-    }
-    .ba-label {
-      position: absolute; top: 20px;
-      font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
-      text-transform: uppercase; padding: 4px 12px;
-      border-radius: 100px;
-    }
-    .ba-label.before-label { right: 20px; background: rgba(255,255,255,0.08); color: var(--muted); }
-    .ba-label.after-label { left: 20px; background: rgba(0,255,209,0.15); color: var(--teal); border: 1px solid rgba(0,255,209,0.3); }
-    /* After content */
-    .ba-after-inner {
-      width: 200%; padding: 40px;
-      display: flex; flex-direction: column; gap: 16px;
-      background: var(--bg2);
-    }
-    .ba-glow-bar {
-      height: 2px; width: 60px;
-      background: var(--teal);
-      box-shadow: 0 0 12px var(--teal);
-    }
-    .ba-title-fake {
-      height: 36px; border-radius: 6px;
-      background: linear-gradient(90deg, var(--teal) 0%, var(--plasma) 100%);
-      width: 70%; opacity: 0.8;
-    }
-    .ba-sub-fake {
-      height: 10px; border-radius: 4px;
-      background: rgba(255,255,255,0.15); width: 85%;
-    }
-    .ba-sub-fake.s2 { width: 60%; }
-    .ba-cta-fake {
-      margin-top: 8px;
-      height: 44px; width: 160px; border-radius: 8px;
-      background: var(--teal);
-      box-shadow: 0 4px 24px rgba(0,255,209,0.4);
-    }
-    .ba-particle {
+    .hero-glow {
       position: absolute;
-      width: 3px; height: 3px;
-      border-radius: 50%;
-      background: var(--teal);
-      opacity: 0.5;
-      animation: float 6s infinite ease-in-out;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0) translateX(0); opacity: 0.5; }
-      50% { transform: translateY(-20px) translateX(10px); opacity: 1; }
-    }
-    /* drag handle */
-    .ba-handle {
-      position: absolute; top: 0; bottom: 0;
+      top: 50%;
       left: 50%;
-      width: 44px;
-      transform: translateX(-50%);
-      cursor: ew-resize;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 10;
+      transform: translate(-50%, -55%);
+      width: 900px;
+      height: 700px;
+      background: radial-gradient(ellipse at center,
+        rgba(123,97,255,0.13) 0%,
+        rgba(0,255,209,0.06) 40%,
+        transparent 70%);
+      pointer-events: none;
     }
-    .ba-handle-line {
-      width: 2px; height: 100%;
-      background: var(--teal);
-      box-shadow: 0 0 16px var(--teal);
+
+    .hero-content {
       position: relative;
-    }
-    .ba-handle-icon {
-      position: absolute;
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      background: var(--teal);
-      display: flex; align-items: center; justify-content: center;
-      top: 50%; transform: translateY(-50%);
-      color: #0A0A0F;
-      font-size: 14px; font-weight: 700;
-      box-shadow: 0 0 24px rgba(0,255,209,0.5);
-    }
-    .demo-caption {
-      text-align: center; margin-top: 32px;
-      font-size: 14px; color: var(--muted);
-    }
-    .demo-caption strong { color: var(--text); }
-
-    /* ── PROBLEM ── */
-    #problem { border-top: 1px solid var(--border); }
-    .problem-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-      margin-top: 64px;
-    }
-    .problem-card {
-      padding: 32px;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      transition: border-color 0.3s, transform 0.3s;
-    }
-    .problem-card:hover {
-      border-color: rgba(255,255,255,0.12);
-      transform: translateY(-4px);
-    }
-    .problem-icon {
-      width: 48px; height: 48px; border-radius: 12px;
-      background: rgba(123,97,255,0.15);
-      border: 1px solid rgba(123,97,255,0.3);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-    .problem-card h3 {
-      font-size: 18px; font-weight: 600;
-      margin-bottom: 12px;
-    }
-    .problem-card p {
-      font-size: 14px; color: var(--muted); line-height: 1.6;
+      max-width: 1104px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    /* ── MODULES ── */
-    #modules { border-top: 1px solid var(--border); }
-    .modules-header { margin-bottom: 80px; max-width: 640px; }
-    .module-item {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
-      padding: 80px 0;
-      border-bottom: 1px solid var(--border);
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 36px;
+      opacity: 0;
+      transform: translateY(16px);
     }
-    .module-item:last-child { border-bottom: none; }
-    .module-item.reverse { direction: rtl; }
-    .module-item.reverse > * { direction: ltr; }
-    .module-number {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--teal);
-      margin-bottom: 16px;
+
+    .hero-title {
+      font-size: clamp(68px, 12.5vw, 168px);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
     }
-    .module-item h3 {
-      font-size: clamp(24px, 3vw, 36px);
-      font-weight: 700; line-height: 1.2;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-    }
-    .module-item p {
-      font-size: 16px; color: var(--muted);
-      line-height: 1.7; margin-bottom: 24px;
-    }
-    .module-tags {
-      display: flex; flex-wrap: wrap; gap: 8px;
-    }
-    .tag {
-      padding: 4px 12px;
-      background: rgba(0,255,209,0.08);
-      border: 1px solid rgba(0,255,209,0.2);
-      border-radius: 100px;
-      font-size: 12px; color: var(--teal);
-      font-weight: 500;
-    }
-    /* Module visual mockup */
-    .module-visual {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 32px;
-      height: 320px;
-      display: flex; flex-direction: column; justify-content: space-between;
-      position: relative; overflow: hidden;
-    }
-    .module-visual::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--teal), transparent);
-      opacity: 0.5;
-    }
-    .mv-dots {
-      display: flex; gap: 6px;
-    }
-    .mv-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-    }
-    .mv-dot:first-child { background: rgba(255,100,100,0.6); }
-    .mv-dot:nth-child(2) { background: rgba(255,200,50,0.6); }
-    .mv-dot:nth-child(3) { background: rgba(100,255,150,0.6); }
-    .mv-content { flex: 1; display: flex; flex-direction: column; gap: 12px; padding-top: 24px; }
-    .mv-line { height: 8px; border-radius: 4px; background: rgba(255,255,255,0.07); }
-    .mv-line.accent { background: linear-gradient(90deg, var(--teal), var(--plasma)); opacity: 0.6; }
-    .mv-line.w30 { width: 30%; }
-    .mv-line.w50 { width: 50%; }
-    .mv-line.w70 { width: 70%; }
-    .mv-line.w90 { width: 90%; }
-    .mv-cta { height: 36px; width: 120px; border-radius: 8px; background: var(--teal); opacity: 0.8; margin-top: 8px; box-shadow: 0 4px 20px rgba(0,255,209,0.3); }
-    .mv-progress {
-      height: 3px; border-radius: 2px;
-      background: rgba(255,255,255,0.08);
+
+    .hero-title .line {
+      display: block;
       overflow: hidden;
     }
-    .mv-progress-bar {
-      height: 100%; width: 65%;
-      background: linear-gradient(90deg, var(--teal), var(--plasma));
-      border-radius: 2px;
+
+    .hero-title .line-inner {
+      display: block;
+      opacity: 0;
+      transform: translateY(100%);
     }
 
-    /* ── STATS ── */
-    #stats {
-      padding: 80px 24px;
-      max-width: 1200px; margin: 0 auto;
+    .hero-title .solid  .line-inner { color: var(--text); }
+    .hero-title .ghost  .line-inner {
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(232,232,240,0.7);
     }
+    .hero-title .plasma .line-inner {
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--plasma);
+      font-style: italic;
+    }
+
+    .hero-bottom {
+      margin-top: 48px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .hero-tagline {
+      font-size: clamp(14px, 1.4vw, 17px);
+      line-height: 1.65;
+      color: var(--muted);
+      max-width: 420px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-shrink: 0;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 30px;
+      background: var(--accent);
+      color: #06060C;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      transition: background 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      background: #00e8bc;
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      cursor: none;
+      transition: color 0.25s;
+      white-space: nowrap;
+    }
+
+    .btn-ghost:hover { color: var(--text); }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 44px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+    }
+
+    .hero-scroll span {
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 44px;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+      animation: scrollPulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.2; transform: scaleY(1); }
+      50%       { opacity: 0.8; transform: scaleY(0.65); }
+    }
+
+    /* ─── TICKER ──────────────────────────────────── */
+    .ticker-wrap {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      overflow: hidden;
+      background: var(--bg-2);
+    }
+
+    .ticker-track {
+      display: flex;
+      animation: ticker 35s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 28px;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .ticker-sep {
+      color: var(--accent);
+      font-size: 14px;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
+    @keyframes ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ─── SECTION LABEL ───────────────────────────── */
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 72px;
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    /* ─── CAPABILITIES ────────────────────────────── */
+    #capabilities { padding: 140px 0; }
+
+    .cap-list { list-style: none; }
+
+    .cap-item {
+      border-top: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    .cap-item:last-child { border-bottom: 1px solid var(--border); }
+
+    .cap-item-inner {
+      display: grid;
+      grid-template-columns: 72px 1fr auto auto;
+      align-items: center;
+      padding: 26px 0;
+      gap: 20px;
+      transition: padding 0.35s var(--ease-out);
+    }
+
+    .cap-item:hover .cap-item-inner { padding: 34px 0; }
+
+    .cap-num {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      transition: color 0.3s;
+    }
+
+    .cap-name {
+      font-size: clamp(20px, 3.2vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      transition: color 0.3s;
+    }
+
+    .cap-tag {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      opacity: 0;
+      transform: translateX(12px);
+      transition: opacity 0.3s, transform 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    .cap-arrow {
+      font-size: 22px;
+      color: var(--muted);
+      transition: transform 0.4s var(--ease-out), color 0.3s;
+      flex-shrink: 0;
+    }
+
+    .cap-item::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.55s var(--ease-out);
+    }
+
+    .cap-item:hover::before    { transform: scaleX(1); }
+    .cap-item:hover .cap-name  { color: var(--accent); }
+    .cap-item:hover .cap-num   { color: var(--accent); }
+    .cap-item:hover .cap-tag   { opacity: 1; transform: translateX(0); color: var(--accent); border-color: rgba(0,255,209,0.25); }
+    .cap-item:hover .cap-arrow { transform: translateX(8px); color: var(--accent); }
+
+    /* ─── STATS ───────────────────────────────────── */
+    #stats {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-2);
+    }
+
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 2px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
       background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
     }
-    .stat-card {
-      background: var(--bg2);
-      padding: 48px 32px;
+
+    .stat-item {
+      background: var(--bg-2);
+      padding: 56px 48px;
       text-align: center;
     }
-    .stat-number {
-      font-size: clamp(40px, 5vw, 64px);
+
+    .stat-val {
+      font-size: clamp(52px, 7.5vw, 96px);
       font-weight: 700;
       letter-spacing: -0.04em;
-      background: linear-gradient(135deg, var(--teal), var(--plasma));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .stat-label {
-      font-size: 14px; color: var(--muted);
-      margin-top: 8px; line-height: 1.4;
+      line-height: 1;
+      color: var(--text);
+      display: block;
     }
 
-    /* ── PRICING ── */
-    #pricing {
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-    .pricing-header { margin-bottom: 16px; }
-    .pricing-sub { color: var(--muted); margin-bottom: 64px; font-size: 16px; }
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      max-width: 1000px; margin: 0 auto;
-      text-align: left;
-    }
-    .pricing-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 40px 32px;
-      position: relative;
-      transition: transform 0.3s, border-color 0.3s;
-    }
-    .pricing-card:hover { transform: translateY(-6px); }
-    .pricing-card.featured {
-      border-color: var(--teal);
-      background: linear-gradient(135deg, rgba(0,255,209,0.05), rgba(123,97,255,0.05));
-      box-shadow: 0 0 60px rgba(0,255,209,0.1);
-    }
-    .featured-badge {
-      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
-      padding: 4px 16px;
-      background: var(--teal);
-      color: #0A0A0F;
-      font-size: 11px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      border-radius: 100px;
-    }
-    .pricing-tier {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.15em;
-      text-transform: uppercase; color: var(--muted);
-      margin-bottom: 16px;
-    }
-    .pricing-price {
-      font-size: 56px; font-weight: 700;
-      letter-spacing: -0.04em;
-      margin-bottom: 8px;
-    }
-    .pricing-price sup { font-size: 24px; font-weight: 500; vertical-align: top; margin-top: 12px; color: var(--muted); }
-    .pricing-price .currency { color: var(--teal); }
-    .pricing-period { font-size: 13px; color: var(--muted); margin-bottom: 32px; }
-    .pricing-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
-    .pricing-features li {
-      font-size: 14px; color: var(--muted);
-      display: flex; align-items: flex-start; gap: 10px;
+    .stat-val .accent { color: var(--accent); }
+
+    .stat-label {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
       line-height: 1.5;
     }
-    .pricing-features li::before {
-      content: '✓';
-      color: var(--teal); font-weight: 700;
-      flex-shrink: 0; margin-top: 1px;
-    }
-    .pricing-cta {
-      display: block; width: 100%;
-      padding: 14px 24px;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 10px;
-      color: var(--text);
-      font-weight: 600; font-size: 14px;
-      cursor: pointer; text-decoration: none;
-      text-align: center;
-      transition: all 0.2s;
-    }
-    .pricing-cta:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); }
-    .pricing-card.featured .pricing-cta {
-      background: var(--teal); color: #0A0A0F;
-      border-color: var(--teal);
-    }
-    .pricing-card.featured .pricing-cta:hover {
-      opacity: 0.85; transform: translateY(-1px);
-      box-shadow: 0 8px 32px rgba(0,255,209,0.3);
-    }
-    .pricing-note {
-      text-align: center; margin-top: 40px;
-      font-size: 13px; color: var(--muted);
-    }
-    .pricing-note a { color: var(--teal); text-decoration: none; }
 
-    /* ── FAQ ── */
-    #faq { border-top: 1px solid var(--border); }
-    .faq-header { text-align: center; margin-bottom: 64px; }
-    .faq-list { max-width: 720px; margin: 0 auto; }
+    /* ─── MECHANISM ───────────────────────────────── */
+    #mechanism { padding: 140px 0; }
+
+    .mech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-top: 72px;
+    }
+
+    .mech-item {
+      background: var(--bg);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mech-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 1px;
+      background: linear-gradient(to right, var(--plasma), var(--accent));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.6s var(--ease-out);
+    }
+
+    .mech-item:hover::before { transform: scaleX(1); }
+
+    .mech-num {
+      font-size: 72px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      color: var(--border);
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .mech-title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 14px;
+    }
+
+    .mech-desc {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    /* ─── COMPARISON ──────────────────────────────── */
+    #comparison {
+      padding: 140px 0;
+      background: var(--bg-2);
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      margin-top: 72px;
+    }
+
+    .comparison-side {
+      padding: 56px 48px;
+    }
+
+    .comparison-side.before { background: rgba(6,6,12,0.9); }
+    .comparison-side.after  { background: rgba(10,10,20,0.95); }
+
+    .comparison-label {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 44px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .comparison-side.before .comparison-label { color: #FF4D6D; }
+    .comparison-side.after  .comparison-label { color: var(--accent); }
+
+    .comparison-label::before {
+      content: '';
+      display: block;
+      width: 20px; height: 1px;
+    }
+
+    .comparison-side.before .comparison-label::before { background: #FF4D6D; }
+    .comparison-side.after  .comparison-label::before { background: var(--accent); }
+
+    .comparison-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .comparison-items li {
+      font-size: 14px;
+      line-height: 1.55;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .comparison-items li::before {
+      content: '';
+      display: block;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .comparison-side.before .comparison-items li        { color: var(--muted); }
+    .comparison-side.before .comparison-items li::before { background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.25); }
+    .comparison-side.after  .comparison-items li        { color: var(--text); }
+    .comparison-side.after  .comparison-items li::before { background: rgba(0,255,209,0.1); border: 1px solid rgba(0,255,209,0.25); }
+
+    .comparison-metric {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+
+    .comparison-metric strong {
+      display: block;
+      font-size: clamp(44px, 6vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .comparison-side.before .comparison-metric strong { color: rgba(255,77,109,0.55); }
+    .comparison-side.after  .comparison-metric strong { color: var(--accent); }
+
+    .comparison-metric span {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      display: block;
+    }
+
+    /* ─── MODULES ─────────────────────────────────── */
+    #modules { padding: 140px 0; }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-top: 72px;
+    }
+
+    .module-item {
+      background: var(--bg);
+      padding: 40px 36px;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    .module-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s var(--ease-out);
+    }
+
+    .module-item:hover::before { transform: scaleX(1); }
+
+    .module-num {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .module-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      color: var(--text);
+      transition: color 0.3s;
+    }
+
+    .module-item:hover .module-name { color: var(--accent); }
+
+    .module-desc {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    /* ─── PRICING ─────────────────────────────────── */
+    #pricing {
+      padding: 140px 0;
+      background: var(--bg-2);
+    }
+
+    .pricing-list {
+      margin-top: 72px;
+      border-top: 1px solid var(--border);
+    }
+
+    .pricing-row {
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .pricing-row-header {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      align-items: center;
+      padding: 36px 0;
+      gap: 20px;
+      cursor: none;
+      transition: padding 0.35s var(--ease-out);
+    }
+
+    .pricing-row-header:hover { padding: 44px 0; }
+
+    .pricing-tier {
+      font-size: clamp(26px, 4vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      transition: color 0.3s;
+    }
+
+    .pricing-row.active .pricing-tier,
+    .pricing-row-header:hover .pricing-tier { color: var(--accent); }
+
+    .pricing-badge {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border: 1px solid var(--plasma);
+      color: var(--plasma);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .pricing-row.featured .pricing-badge { opacity: 1; }
+
+    .pricing-price {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      transition: color 0.3s;
+    }
+
+    .pricing-row.active .pricing-price,
+    .pricing-row-header:hover .pricing-price { color: var(--text); }
+
+    .pricing-toggle {
+      width: 30px; height: 30px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: border-color 0.3s, color 0.3s, transform 0.45s var(--ease-out);
+    }
+
+    .pricing-row.active .pricing-toggle {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: rotate(45deg);
+    }
+
+    .pricing-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.55s var(--ease-out);
+    }
+
+    .pricing-row.active .pricing-body { max-height: 700px; }
+
+    .pricing-body-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 56px;
+      padding: 0 0 52px;
+    }
+
+    .pricing-feat-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .pricing-feat-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .pricing-feat-list li::before {
+      content: '→';
+      color: var(--accent);
+      flex-shrink: 0;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .pricing-cta-wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 20px;
+      min-width: 240px;
+    }
+
+    .pricing-desc {
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 280px;
+    }
+
+    /* ─── EVIDENCE ────────────────────────────────── */
+    #evidence { padding: 140px 0; }
+
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      margin-top: 72px;
+    }
+
+    .evidence-item {
+      background: var(--bg);
+      padding: 48px 40px;
+    }
+
+    .evidence-mark {
+      font-size: 32px;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .evidence-quote {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text);
+      margin-bottom: 32px;
+    }
+
+    .evidence-author {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .evidence-role {
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.5;
+      margin-top: 4px;
+    }
+
+    /* ─── FAQ ─────────────────────────────────────── */
+    #faq {
+      padding: 140px 0;
+      background: var(--bg-2);
+    }
+
+    .faq-list {
+      margin-top: 72px;
+      border-top: 1px solid var(--border);
+    }
+
     .faq-item {
       border-bottom: 1px solid var(--border);
-      padding: 24px 0;
+      overflow: hidden;
     }
+
     .faq-question {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 16px; font-weight: 500;
-      cursor: pointer; gap: 16px;
-      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 26px 0;
+      cursor: none;
+      font-size: clamp(15px, 1.6vw, 19px);
+      font-weight: 600;
+      color: var(--text);
+      transition: color 0.3s;
+      gap: 24px;
     }
-    .faq-question:hover { color: var(--teal); }
+
+    .faq-item.active .faq-question { color: var(--accent); }
+
     .faq-icon {
-      width: 24px; height: 24px; flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
-      transition: transform 0.3s, border-color 0.3s, background 0.3s;
+      width: 26px; height: 26px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: transform 0.45s var(--ease-out), border-color 0.3s, color 0.3s;
     }
-    .faq-item.open .faq-icon {
+
+    .faq-item.active .faq-icon {
       transform: rotate(45deg);
-      border-color: var(--teal);
-      background: rgba(0,255,209,0.1);
-      color: var(--teal);
+      border-color: var(--accent);
+      color: var(--accent);
     }
+
     .faq-answer {
-      font-size: 14px; color: var(--muted); line-height: 1.7;
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.4s ease, margin 0.4s ease;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s var(--ease-out);
     }
-    .faq-item.open .faq-answer { max-height: 300px; margin-top: 16px; }
 
-    /* ── FINAL CTA ── */
-    #final-cta {
-      padding: 160px 24px;
+    .faq-item.active .faq-answer { max-height: 280px; }
+
+    .faq-answer-inner {
+      padding: 0 0 28px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 660px;
+    }
+
+    /* ─── CTA FINAL ───────────────────────────────── */
+    #cta-final {
+      padding: 160px 48px;
       text-align: center;
-      max-width: 1200px; margin: 0 auto;
+      position: relative;
+      overflow: hidden;
     }
-    .final-cta-inner {
-      background: linear-gradient(135deg, rgba(0,255,209,0.06), rgba(123,97,255,0.06));
-      border: 1px solid rgba(0,255,209,0.2);
-      border-radius: 32px;
-      padding: 80px 48px;
-      position: relative; overflow: hidden;
-    }
-    .final-cta-inner::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--teal), var(--plasma), transparent);
-    }
-    .final-cta-inner h2 { font-size: clamp(32px, 5vw, 64px); margin-bottom: 16px; }
-    .final-cta-inner p { color: var(--muted); font-size: 18px; max-width: 480px; margin: 0 auto 48px; }
-    .final-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .paypal-btn {
-      padding: 16px 32px;
-      background: #0070BA;
-      color: white;
-      font-weight: 700; font-size: 15px;
-      border: none; border-radius: 8px;
-      cursor: pointer; text-decoration: none;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-    .paypal-btn:hover { opacity: 0.85; transform: translateY(-2px); }
 
-    /* ── FOOTER ── */
+    #cta-final::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px; height: 500px;
+      background: radial-gradient(ellipse, rgba(123,97,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-pre {
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 32px;
+    }
+
+    .cta-headline {
+      font-size: clamp(44px, 8.5vw, 112px);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 0.92;
+      text-transform: uppercase;
+      max-width: 1000px;
+      margin: 0 auto 28px;
+      position: relative;
+    }
+
+    .cta-headline .ghost-line {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(232,232,240,0.6);
+    }
+
+    .cta-subtext {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 420px;
+      margin: 0 auto 52px;
+      line-height: 1.65;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-paypal {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .btn-paypal:hover {
+      border-color: #009CDE;
+      color: #009CDE;
+    }
+
+    /* ─── FOOTER ──────────────────────────────────── */
     footer {
-      padding: 40px 24px;
+      padding: 36px 48px;
       border-top: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-      max-width: 1200px; margin: 0 auto;
-      flex-wrap: wrap; gap: 16px;
-    }
-    .footer-logo { font-size: 13px; color: var(--muted); }
-    .footer-logo span { color: var(--teal); }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--text); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      nav { padding: 16px 20px; }
-      section { padding: 80px 20px; }
-      .module-item { grid-template-columns: 1fr; gap: 40px; direction: ltr; }
-      .module-item.reverse { direction: ltr; }
-      h2 { font-size: 32px; }
-      .before-after { height: 340px; }
-      footer { flex-direction: column; text-align: center; }
-      .final-cta-inner { padding: 48px 24px; }
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
     }
 
-    /* ── UNLOCK SWEEP ── */
-    .sweep-wrap { position: relative; overflow: hidden; }
-    .sweep-wrap::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(0,255,209,0.12) 50%, transparent 100%);
-      transform: translateX(-100%);
-      animation: sweep 2s 0.5s ease forwards;
-    }
-    @keyframes sweep {
-      to { transform: translateX(200%); }
+    .footer-logo {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
     }
 
-    /* counter */
-    .count-up { font-variant-numeric: tabular-nums; }
+    .footer-logo span { color: var(--accent); }
+
+    .footer-legal {
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0.4;
+    }
+
+    /* ─── REVEAL BASE ─────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+
+    /* ─── MOBILE ──────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      #hero { padding: 110px 24px 80px; }
+      .container { padding: 0 24px; }
+      #cta-final { padding: 120px 24px; }
+      footer { padding: 28px 24px; }
+
+      .hero-bottom { flex-direction: column; gap: 28px; align-items: flex-start; }
+      .hero-actions { flex-wrap: wrap; }
+
+      .cap-item-inner { grid-template-columns: 52px 1fr auto; }
+      .cap-tag { display: none; }
+
+      .stats-grid      { grid-template-columns: 1fr; }
+      .mech-grid       { grid-template-columns: 1fr; }
+      .comparison-grid { grid-template-columns: 1fr; }
+      .modules-grid    { grid-template-columns: repeat(2, 1fr); }
+      .evidence-grid   { grid-template-columns: 1fr; }
+
+      .pricing-row-header  { grid-template-columns: 1fr auto auto; }
+      .pricing-badge       { display: none; }
+      .pricing-body-inner  { grid-template-columns: 1fr; }
+      .pricing-cta-wrap    { min-width: unset; }
+
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+
+      .cursor-dot, .cursor-ring { display: none; }
+      body { cursor: auto; }
+      a, button, .pricing-row-header, .faq-question { cursor: pointer; }
+    }
+
+    @media (max-width: 540px) {
+      .modules-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
-<body>
+<body class="loading">
 
-  <!-- Cursor -->
-  <div id="cursor"></div>
-  <div id="cursor-glow"></div>
+<!-- Cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- NAV -->
-  <nav>
-    <div class="nav-logo">Spatial <span>Engine</span></div>
-    <a href="#pricing" class="nav-cta">Acceder al Engine →</a>
-  </nav>
+<!-- Loader -->
+<div id="loader">
+  <div id="loader-brand">FSCE — 100M</div>
+  <div id="loader-count">000</div>
+</div>
 
-  <!-- HERO -->
-  <div id="hero">
-    <div class="grid-lines"></div>
-    <div class="hero-badge">FSCE-100M // Imaginium Universe</div>
-    <h1>
-      Tu web actual está<br/>
-      <span class="accent">perdiendo ventas</span><br/>
-      ahora mismo.
+<!-- Particles -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- ══ NAV ══════════════════════════════════════════ -->
+<nav id="nav">
+  <a href="#" class="nav-logo">FSCE<span>—</span>100M</a>
+  <a href="#pricing" class="nav-cta">Get Access ↗</a>
+</nav>
+
+<!-- ══ HERO ═════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Framer Spatial Cinematic Engine · V4.0</p>
+    <h1 class="hero-title">
+      <span class="line solid" ><span class="line-inner">SPATIAL</span></span>
+      <span class="line ghost" ><span class="line-inner">ENGINE</span></span>
+      <span class="line plasma"><span class="line-inner">CINEMATIC</span></span>
     </h1>
-    <p class="hero-sub">
-      Spatial Engine convierte cualquier web en una experiencia cinematográfica que genera alto ticket en piloto automático.
-    </p>
-    <div class="hero-actions">
-      <a href="#pricing" class="btn-primary">Ver el engine en acción ↓</a>
-      <a href="#demo" class="btn-ghost">¿Cómo funciona?</a>
-    </div>
-  </div>
-
-  <!-- BEFORE / AFTER DEMO -->
-  <section id="demo">
-    <div class="demo-header reveal">
-      <div class="section-label">La diferencia es inmediata</div>
-      <h2>Arrastrá para <span class="accent">ver el cambio</span></h2>
-    </div>
-    <div class="before-after reveal" id="baContainer">
-      <!-- Before -->
-      <div class="ba-side ba-before">
-        <div class="ba-before-inner">
-          <div class="ba-bar short"></div>
-          <div class="ba-bar full"></div>
-          <div class="ba-bar mid"></div>
-          <div style="height:16px"></div>
-          <div class="ba-bar full"></div>
-          <div class="ba-bar mid"></div>
-          <div class="ba-bar short"></div>
-          <div class="ba-btn-fake"></div>
-        </div>
-        <div class="ba-label before-label">Web genérica</div>
-      </div>
-      <!-- After -->
-      <div class="ba-side ba-after" id="baAfter">
-        <div class="ba-after-inner">
-          <div class="ba-glow-bar"></div>
-          <div class="ba-title-fake"></div>
-          <div class="ba-sub-fake"></div>
-          <div class="ba-sub-fake s2"></div>
-          <div class="ba-cta-fake"></div>
-        </div>
-        <!-- particles -->
-        <div class="ba-particle" style="top:20%;left:20%;animation-delay:0s"></div>
-        <div class="ba-particle" style="top:60%;left:70%;animation-delay:2s"></div>
-        <div class="ba-particle" style="top:40%;left:40%;animation-delay:4s"></div>
-        <div class="ba-label after-label">Spatial Engine</div>
-      </div>
-      <!-- Handle -->
-      <div class="ba-handle" id="baHandle">
-        <div class="ba-handle-line">
-          <div class="ba-handle-icon">⟺</div>
-        </div>
-      </div>
-    </div>
-    <p class="demo-caption reveal">
-      <strong>Esto no es un template.</strong> Es un sistema de arquitectura que hace que el cerebro de tu cliente diga "quiero esto".
-    </p>
-  </section>
-
-  <!-- PROBLEM -->
-  <section id="problem">
-    <div class="section-label reveal">El diagnóstico</div>
-    <h2 class="reveal">Por qué tu web actual<br/><span class="accent">no convierte</span></h2>
-    <div class="problem-grid">
-      <div class="problem-card reveal reveal-delay-1">
-        <div class="problem-icon">⚡</div>
-        <h3>Se ve igual que la competencia</h3>
-        <p>El cerebro ignora lo familiar. Si tu web se parece a las demás, es invisible. No hay diferenciación = no hay conversión.</p>
-      </div>
-      <div class="problem-card reveal reveal-delay-2">
-        <div class="problem-icon">🧠</div>
-        <h3>No activa ninguna emoción</h3>
-        <p>El 95% de las decisiones de compra son emocionales. Una web estática no genera dopamina, no genera urgencia, no genera acción.</p>
-      </div>
-      <div class="problem-card reveal reveal-delay-3">
-        <div class="problem-icon">💸</div>
-        <h3>Dejás el 80% del revenue en la mesa</h3>
-        <p>Un visitante que no siente nada, no compra. Cada rebote es dinero que se fue. Spatial Engine convierte la experiencia en revenue.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <div id="stats">
-    <div class="stats-grid sweep-wrap">
-      <div class="stat-card reveal">
-        <div class="stat-number count-up" data-target="3.8">0</div>
-        <div class="stat-label">× más tiempo<br/>en página</div>
-      </div>
-      <div class="stat-card reveal reveal-delay-1">
-        <div class="stat-number count-up" data-target="312" data-suffix="%">0</div>
-        <div class="stat-label">aumento en<br/>tasa de conversión</div>
-      </div>
-      <div class="stat-card reveal reveal-delay-2">
-        <div class="stat-number count-up" data-target="97" data-suffix="%">0</div>
-        <div class="stat-label">de clientes no vuelven<br/>a diseño genérico</div>
-      </div>
-      <div class="stat-card reveal reveal-delay-3">
-        <div class="stat-number" style="font-size:40px;">$100M</div>
-        <div class="stat-label">asset class —<br/>el standard de calidad</div>
+    <div class="hero-bottom">
+      <p class="hero-tagline">
+        The $100M framework for Framer developers who build digital worlds that convert traffic into high-ticket revenue — with Hollywood precision.
+      </p>
+      <div class="hero-actions">
+        <a href="#pricing" class="btn-primary">Build With FSCE ↗</a>
+        <a href="#capabilities" class="btn-ghost">See the system ↓</a>
       </div>
     </div>
   </div>
+  <div class="hero-scroll">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
 
-  <!-- MODULES -->
-  <section id="modules">
-    <div class="modules-header reveal">
-      <div class="section-label">Los módulos del engine</div>
-      <h2>Tres sistemas.<br/><span class="accent">Un universo.</span></h2>
-    </div>
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item">COACHES</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">AGENCIES</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">COURSE CREATORS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">E-COMMERCE BRANDS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">THERAPISTS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">MENTORS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">HIGH-TICKET SERVICES</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">SAAS FOUNDERS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">COACHK���span><span class="ticker-sep">·</span>
+    <span class="ticker-item">AGENCIES</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">COURSE CREATORS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">E-COMMERCE BRANDS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">THERAPISTS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">MENTORS</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">HIGH-TICKET SERVICES</span><span class="ticker-sep">·</span>
+    <span class="ticker-item">SAAS FOUNDERS</span><span class="ticker-sep">·</span>
+  </div>
+</div>
 
-    <!-- Module A -->
-    <div class="module-item reveal">
-      <div>
-        <div class="module-number">Módulo A — E-Commerce</div>
-        <h3>Anti-Shopify Protocol</h3>
-        <p>Checkout cinematográfico sin reloads de página. El "agregar al carrito" es una transición 3D dentro del mismo canvas. Bundling interactivo con dopamina visual en cada unlock.</p>
-        <div class="module-tags">
-          <span class="tag">Stripe API</span>
-          <span class="tag">Framer Commerce</span>
-          <span class="tag">React Override</span>
-          <span class="tag">Lottie Rewards</span>
+<!-- ══ CAPABILITIES ══════════════════════════════════ -->
+<section id="capabilities">
+  <div class="container">
+    <p class="section-label">What We Engineer</p>
+    <ul class="cap-list">
+      <li class="cap-item">
+        <div class="cap-item-inner">
+          <span class="cap-num">01</span>
+          <span class="cap-name">Cinematic Landing Pages</span>
+          <span class="cap-tag">Convert</span>
+          <span class="cap-arrow">→</span>
         </div>
-      </div>
-      <div class="module-visual">
-        <div class="mv-dots"><div class="mv-dot"></div><div class="mv-dot"></div><div class="mv-dot"></div></div>
-        <div class="mv-content">
-          <div class="mv-line accent w30"></div>
-          <div class="mv-line w90"></div>
-          <div class="mv-line w70"></div>
-          <div style="height:8px"></div>
-          <div class="mv-line w50"></div>
-          <div class="mv-cta"></div>
+      </li>
+      <li class="cap-item">
+        <div class="cap-item-inner">
+          <span class="cap-num">02</span>
+          <span class="cap-name">High-Ticket VSL Funnels</span>
+          <span class="cap-tag">Sell</span>
+          <span class="cap-arrow">→</span>
         </div>
-        <div class="mv-progress"><div class="mv-progress-bar"></div></div>
-      </div>
-    </div>
+      </li>
+      <li class="cap-item">
+        <div class="cap-item-inner">
+          <span class="cap-num">03</span>
+          <span class="cap-name">Gamified Course Platforms</span>
+          <span class="cap-tag">Retain</span>
+          <span class="cap-arrow">→</span>
+        </div>
+      </li>
+      <li class="cap-item">
+        <div class="cap-item-inner">
+          <span class="cap-num">04</span>
+          <span class="cap-name">Anti-Shopify Storefronts</span>
+          <span class="cap-tag">Scale</span>
+          <span class="cap-arrow">→</span>
+        </div>
+      </li>
+      <li class="cap-item">
+        <div class="cap-item-inner">
+          <span class="cap-num">05</span>
+          <span class="cap-name">Behavioral Conversion Architecture</span>
+          <span class="cap-tag">Optimize</span>
+          <span class="cap-arrow">→</span>
+        </div>
+      </li>
+      <li class="cap-item">
+        <div class="cap-item-inner">
+          <span class="cap-num">06</span>
+          <span class="cap-name">Framer Component Systems</span>
+          <span class="cap-tag">Build</span>
+          <span class="cap-arrow">→</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
 
-    <!-- Module B -->
-    <div class="module-item reverse reveal">
-      <div>
-        <div class="module-number">Módulo B — Alto Ticket</div>
-        <h3>VSL Cinematic<br/>Landings</h3>
-        <p>El viewport reacciona al progreso del video. Si el usuario pausa, entra en Cinema Suspense Mode. Los CTAs se desbloquean solo cuando la oferta es revelada — con animaciones de partículas.</p>
-        <div class="module-tags">
-          <span class="tag">Hook-First Architecture</span>
-          <span class="tag">Video Reactive</span>
-          <span class="tag">Particle Unlock</span>
-          <span class="tag">Onboarding Quizzes</span>
-        </div>
+<!-- ══ STATS ═════════════════════════════════════════ -->
+<section id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal" data-target="47" data-suffix="%">
+        <span class="stat-val"><span class="counter">0</span><span class="accent">%</span></span>
+        <p class="stat-label">Average conversion lift over client's previous site</p>
       </div>
-      <div class="module-visual">
-        <div class="mv-dots"><div class="mv-dot"></div><div class="mv-dot"></div><div class="mv-dot"></div></div>
-        <div class="mv-content">
-          <div style="background:rgba(123,97,255,0.2);border:1px solid rgba(123,97,255,0.4);border-radius:8px;height:120px;display:flex;align-items:center;justify-content:center;color:var(--plasma);font-size:24px;">▶</div>
-          <div class="mv-line w70"></div>
-          <div class="mv-line w50"></div>
-          <div class="mv-cta" style="background:var(--plasma);box-shadow:0 4px 20px rgba(123,97,255,0.4);"></div>
-        </div>
-        <div class="mv-progress"><div class="mv-progress-bar" style="background:linear-gradient(90deg,var(--plasma),var(--teal));width:40%;"></div></div>
+      <div class="stat-item reveal" data-target="83" data-decimal="true" data-suffix="×">
+        <span class="stat-val"><span class="counter">0</span><span class="accent">×</span></span>
+        <p class="stat-label">Average ROI reported by agency clients</p>
+      </div>
+      <div class="stat-item reveal" data-target="72" data-suffix="h">
+        <span class="stat-val"><span class="counter">0</span><span class="accent">h</span></span>
+        <p class="stat-label">Time to first live Framer build</p>
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- Module C -->
-    <div class="module-item reveal">
-      <div>
-        <div class="module-number">Módulo C — Educación</div>
-        <h3>Gamified Learning<br/>Universes</h3>
-        <p>No más "Módulo 1". Tus estudiantes entran al "Portal del Despertar". Progresión Level 1 → Level 9 con badges Rive/Lottie, barras de energía y dopamina visual en cada milestone.</p>
-        <div class="module-tags">
-          <span class="tag">Framer CMS</span>
-          <span class="tag">Rive Animations</span>
-          <span class="tag">Level System</span>
-          <span class="tag">Anti-Hotmart</span>
-        </div>
+<!-- ══ MECHANISM ═════════════════════════════════════ -->
+<section id="mechanism">
+  <div class="container">
+    <p class="section-label reveal">How It Works</p>
+    <div class="mech-grid">
+      <div class="mech-item reveal">
+        <span class="mech-num">01</span>
+        <h3 class="mech-title">Cinematic Concept</h3>
+        <p class="mech-desc">Define the emotional tone, visual references, and gamification narrative. Every FSCE site starts with a story — not a template.</p>
       </div>
-      <div class="module-visual">
-        <div class="mv-dots"><div class="mv-dot"></div><div class="mv-dot"></div><div class="mv-dot"></div></div>
-        <div class="mv-content">
-          <div style="display:flex;gap:8px;margin-bottom:8px;">
-            <div style="background:rgba(0,255,209,0.3);border:1px solid var(--teal);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--teal);font-weight:600;">LVL 1 ✓</div>
-            <div style="background:rgba(0,255,209,0.15);border:1px solid rgba(0,255,209,0.3);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--teal);">LVL 2</div>
-            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);">🔒 LVL 3</div>
-          </div>
-          <div class="mv-line w90"></div>
-          <div class="mv-line w60"></div>
-        </div>
-        <div class="mv-progress"><div class="mv-progress-bar" style="width:33%;"></div></div>
+      <div class="mech-item reveal">
+        <span class="mech-num">02</span>
+        <h3 class="mech-title">Conversion Architecture</h3>
+        <p class="mech-desc">Map the psychological journey — hooks, friction elimination, dopamine loops, and urgency mechanics — before touching a single component.</p>
+      </div>
+      <div class="mech-item reveal">
+        <span class="mech-num">03</span>
+        <h3 class="mech-title">Framer Execution</h3>
+        <p class="mech-desc">Build, deploy, and iterate with the FSCE component library, custom code overrides, and scroll-reactive motion systems tuned for conversion.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- PRICING -->
-  <section id="pricing">
-    <div class="pricing-header reveal">
-      <div class="section-label">Invertí una vez, convertí para siempre</div>
-      <h2>Elegí tu <span class="accent">nivel de acceso</span></h2>
-    </div>
-    <p class="pricing-sub reveal">Precio de lanzamiento — disponible por tiempo limitado</p>
-    <div class="pricing-grid">
-      <!-- Core -->
-      <div class="pricing-card reveal reveal-delay-1">
-        <div class="pricing-tier">Core</div>
-        <div class="pricing-price"><sup>$</sup><span class="currency">197</span></div>
-        <div class="pricing-period">pago único — acceso de por vida</div>
-        <ul class="pricing-features">
-          <li>Skill FSCE-100M instalable en Claude</li>
-          <li>5 blueprints de funnels (VSL, Ecommerce, Cursos, Agencia, Coach)</li>
-          <li>Biblioteca de Code Overrides para Framer</li>
-          <li>Guía de implementación completa</li>
-          <li>Acceso a actualizaciones V1 → V2</li>
+<!-- ══ COMPARISON ════════════════════════════════════ -->
+<section id="comparison">
+  <div class="container">
+    <p class="section-label reveal">Before · After</p>
+    <div class="comparison-grid">
+      <div class="comparison-side before reveal">
+        <div class="comparison-label">Without FSCE</div>
+        <ul class="comparison-items">
+          <li>Generic Hotmart or Shopify template — identical to every competitor</li>
+          <li>Static layout with no motion, no micro-interactions, no scroll behavior</li>
+          <li>Checkout is a full page jump — momentum dies at the critical moment</li>
+          <li>No visual hierarchy — visitors don't know where to look first</li>
+          <li>Mobile version is an afterthought — janky, unresponsive, forgettable</li>
+          <li>Zero psychological hooks — traffic leaves without acting</li>
         </ul>
-        <a href="https://buy.stripe.com/dRmdR8epuceScl60gi4ZG0q" class="pricing-cta" target="_blank">Acceder al Core →</a>
+        <div class="comparison-metric">
+          <strong>~1.8%</strong>
+          <span>Industry average landing page conversion rate</span>
+        </div>
       </div>
-      <!-- Pro -->
-      <div class="pricing-card featured reveal reveal-delay-2">
-        <div class="featured-badge">Más popular</div>
-        <div class="pricing-tier">Pro</div>
-        <div class="pricing-price"><sup>$</sup><span class="currency">497</span></div>
-        <div class="pricing-period">pago único — acceso de por vida</div>
-        <ul class="pricing-features">
-          <li>Todo lo del plan Core</li>
-          <li>3 templates Framer premium (dark-mode, listos para clonar)</li>
-          <li>Sesión de 60 min con Imaginium Universe</li>
-          <li>Revisión de tu funnel actual + diagnóstico</li>
-          <li>Acceso prioritario a nuevos módulos</li>
+      <div class="comparison-side after reveal">
+        <div class="comparison-label">With FSCE</div>
+        <ul class="comparison-items">
+          <li>Cinematic digital world built around your brand's specific narrative</li>
+          <li>Particle systems, scroll transforms, magnetic cursors — every element reacts</li>
+          <li>Three-dimensional micro-animated checkout transition — friction eliminated</li>
+          <li>Precision visual hierarchy that guides attention through the conversion flow</li>
+          <li>Full cinematic experience on every screen — mobile-first, no exceptions</li>
+          <li>Dopamine loops engineered into every interaction — visitors want to stay</li>
         </ul>
-        <a href="https://buy.stripe.com/9B64gy1CI1AeacYbZ04ZG0r" class="pricing-cta" target="_blank">Acceder al Pro →</a>
-      </div>
-      <!-- Agency -->
-      <div class="pricing-card reveal reveal-delay-3">
-        <div class="pricing-tier">Agency</div>
-        <div class="pricing-price"><sup>$</sup><span class="currency">997</span></div>
-        <div class="pricing-period">pago único — licencia comercial</div>
-        <ul class="pricing-features">
-          <li>Todo lo del plan Pro</li>
-          <li>Licencia para usar el engine con clientes ilimitados</li>
-          <li>Pack de componentes custom para agencias</li>
-          <li>2 sesiones de estrategia con Imaginium Universe</li>
-          <li>Acceso al grupo privado de Agency Partners</li>
-        </ul>
-        <a href="https://buy.stripe.com/aFa9AS5SY6Uy4SEe784ZG0s" class="pricing-cta" target="_blank">Acceder al Agency →</a>
+        <div class="comparison-metric">
+          <strong>~8.7%</strong>
+          <span>Reported conversion rate on FSCE-built pages</span>
+        </div>
       </div>
     </div>
-    <p class="pricing-note reveal">
-      ¿Preferís pagar con PayPal? <a href="https://paypal.me/imaginiumart">Hacé click acá</a> · Garantía de 7 días sin preguntas
-    </p>
-  </section>
+  </div>
+</section>
 
-  <!-- FAQ -->
-  <section id="faq">
-    <div class="faq-header reveal">
-      <div class="section-label">Preguntas frecuentes</div>
-      <h2>Todo lo que<br/><span class="accent">necesitás saber</span></h2>
-    </div>
-    <div class="faq-list">
-      <div class="faq-item reveal">
-        <div class="faq-question">
-          <span>¿Necesito saber programar para usar Spatial Engine?</span>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">No. El engine está diseñado para funcionar con Framer, que es una herramienta visual. Los code overrides vienen listos para copiar y pegar. Si podés usar Framer, podés usar Spatial Engine.</div>
+<!-- ══ MODULES ════════════════════════════════════════ -->
+<section id="modules">
+  <div class="container">
+    <p class="section-label reveal">What's Inside</p>
+    <div class="modules-grid">
+      <div class="module-item reveal">
+        <div class="module-num">M-01</div>
+        <div class="module-name">Cinematic Loader System</div>
+        <div class="module-desc">Counter sequences, curtain exits, and branded reveal animations that set the tone before the page even loads.</div>
       </div>
-      <div class="faq-item reveal reveal-delay-1">
-        <div class="faq-question">
-          <span>¿Funciona para cualquier tipo de negocio?</span>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">Sí. El engine tiene módulos específicos para e-commerce, landings de alto ticket (coaches, mentores, agencias), y plataformas de cursos. Si tu negocio tiene una web, el FSCE lo mejora.</div>
+      <div class="module-item reveal">
+        <div class="module-num">M-02</div>
+        <div class="module-name">Particle Field Engine</div>
+        <div class="module-desc">Canvas-based particle systems with cursor interaction, connection meshes, and performance-optimized 60fps rendering.</div>
       </div>
-      <div class="faq-item reveal reveal-delay-2">
-        <div class="faq-question">
-          <span>¿En cuánto tiempo veo resultados?</span>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">Los resultados son inmediatos a nivel visual — la diferencia se ve en el momento que implementás. El impacto en conversión típicamente se mide en las primeras 2-4 semanas de tráfico.</div>
+      <div class="module-item reveal">
+        <div class="module-num">M-03</div>
+        <div class="module-name">Magnetic Cursor</div>
+        <div class="module-desc">Custom cursor with lerp lag, magnetic attraction to interactive elements, and blend mode effects across all states.</div>
       </div>
-      <div class="faq-item reveal reveal-delay-3">
-        <div class="faq-question">
-          <span>¿El acceso tiene vencimiento?</span>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">No. El pago es único y el acceso es de por vida, incluyendo todas las actualizaciones de la versión que compraste. El engine evoluciona con vos.</div>
+      <div class="module-item reveal">
+        <div class="module-num">M-04</div>
+        <div class="module-name">Scroll Motion Library</div>
+        <div class="module-desc">GSAP ScrollTrigger orchestration — parallax, pinned sequences, horizontal scrolls, and staggered cascade reveals.</div>
       </div>
-      <div class="faq-item reveal">
-        <div class="faq-question">
-          <span>¿Hay garantía?</span>
-          <div class="faq-icon">+</div>
-        </div>
-        <div class="faq-answer">7 días de garantía sin preguntas. Si implementás el engine y no ves la diferencia, te devolvemos el 100%. No nos interesa retener clientes que no están convencidos — nos interesa que vean resultados.</div>
+      <div class="module-item reveal">
+        <div class="module-num">M-05</div>
+        <div class="module-name">VSL Reactive Interface</div>
+        <div class="module-desc">Page responds to video state — suspense mode on pause, unlock animations on price reveal, cinematic cue system throughout.</div>
       </div>
-    </div>
-  </section>
-
-  <!-- FINAL CTA -->
-  <section id="final-cta">
-    <div class="final-cta-inner reveal">
-      <div class="section-label" style="text-align:center;margin-bottom:24px;">El futuro de tu web empieza hoy</div>
-      <h2>¿Seguís esperando<br/>o <span class="accent">actuás ahora</span>?</h2>
-      <p>Mientras lees esto, tu competencia tiene webs que se ven del futuro. El gap se cierra o se amplía — tu movimiento.</p>
-      <div class="final-actions">
-        <a href="#pricing" class="btn-primary">Acceder al Spatial Engine</a>
-        <a href="https://paypal.me/imaginiumart" class="paypal-btn">Pagar con PayPal</a>
+      <div class="module-item reveal">
+        <div class="module-num">M-06</div>
+        <div class="module-name">Gamified Checkout</div>
+        <div class="module-desc">Fluid cart-to-checkout transitions, dynamic bundling UIs, and progress indicators that reward and accelerate momentum.</div>
       </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">Spatial <span>Engine</span> — by Imaginium Universe</div>
-    <div class="footer-links">
-      <a href="#">Términos</a>
-      <a href="#">Privacidad</a>
-      <a href="mailto:lucassandoval0709@gmail.com">Contacto</a>
-    </div>
-  </footer>
-
-  <script>
-    // ── CURSOR
-    const cursor = document.getElementById('cursor');
-    const glow = document.getElementById('cursor-glow');
-    document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
-      glow.style.left = e.clientX + 'px';
-      glow.style.top = e.clientY + 'px';
-    });
-    document.querySelectorAll('a, button, .faq-question, .ba-handle').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.width = '32px';
-        cursor.style.height = '32px';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.width = '12px';
-        cursor.style.height = '12px';
-      });
-    });
-
-    // ── SCROLL REVEAL
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          revealObserver.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-    // ── BEFORE/AFTER SLIDER
-    const container = document.getElementById('baContainer');
-    const afterEl = document.getElementById('baAfter');
-    const handle = document.getElementById('baHandle');
-    let isDragging = false;
-
-    function setPosition(clientX) {
-      const rect = container.getBoundingClientRect();
-      let pct = (clientX - rect.left) / rect.width * 100;
-      pct = Math.max(10, Math.min(90, pct));
-      afterEl.style.width = pct + '%';
-      handle.style.left = pct + '%';
-    }
-
-    handle.addEventListener('mousedown', () => isDragging = true);
-    document.addEventListener('mouseup', () => isDragging = false);
-    document.addEventListener('mousemove', e => { if (isDragging) setPosition(e.clientX); });
-    handle.addEventListener('touchstart', () => isDragging = true, {passive:true});
-    document.addEventListener('touchend', () => isDragging = false);
-    document.addEventListener('touchmove', e => {
-      if (isDragging) setPosition(e.touches[0].clientX);
-    }, {passive:true});
-
-    // ── COUNTER ANIMATION
-    function animateCount(el) {
-      const target = parseFloat(el.dataset.target);
-      const suffix = el.dataset.suffix || '';
-      const isDecimal = target % 1 !== 0;
-      const duration = 1600;
-      const start = performance.now();
-      function update(now) {
-        const progress = Math.min((now - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const current = target * ease;
-        el.textContent = (isDecimal ? current.toFixed(1) : Math.round(current)) + suffix;
-        if (progress < 1) requestAnimationFrame(update);
-      }
-      requestAnimationFrame(update);
-    }
-    const countObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          animateCount(e.target);
-          countObserver.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('.count-up').forEach(el => countObserver.observe(el));
-
-    // ── FAQ ACCORDION
-    document.querySelectorAll('.faq-item').forEach(item => {
-      item.querySelector('.faq-question').addEventListener('click', () => {
-        const isOpen = item.classList.contains('open');
-        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-        if (!isOpen) item.classList.add('open');
-      });
-    });
-  </script>
-</body>
-</html>
+      <div class="module-item reveal">
+        <div class="module-num">M-07</div>
+        <div class="module-name">Course Universe System</div>
+        <div class="module-desc">Transform module lists into interactive portals. Energy bars, badge unlocks, Lottie/Rive integrations for dopamine on every lesson.</div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">M-08</div>
+        <div class="module-name">Typography Motion Kit</div>
+        <div class="module-desc">Clip-path reveals, ghost text, kinetic headings, and split-text animations engineered for cinematic typographic impact.</div>
+      </div>
+      <div class="module-item reveal">
+        <div class="module-num">M-09</div>
+        <div class="module-name">Code Override Vault</div>
+        <div class="module-desc">70+ custom Fram
